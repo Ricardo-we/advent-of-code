@@ -1,0 +1,39 @@
+const fs = require("fs");
+
+const data = fs.readFileSync("./test_2.txt",
+    { encoding: 'utf8', flag: 'r' }).split("\n");
+
+const maxOfEachColor = {
+    red: 12,
+    green: 13,
+    blue: 14,
+};
+
+const solution = (str) => {
+    const gameRound = str.split(":")[1].split(";");
+
+    let usedValues = {
+        red: 0,
+        blue: 0,
+        green: 0,
+    };
+
+    gameRound.forEach((round) => {
+        round.trim().split(",").forEach((roundValue) => {
+            const [value, key] = roundValue.trim().split(" ");
+            usedValues[key] = Math.max(usedValues[key], Number(value));
+        })
+    });
+
+
+    const result = Object.values(usedValues).reduce((a, b) => a * b, 1);
+    return result;
+
+}
+
+const result = data.map((str) => solution(str))
+.reduce((a, b) => a + b);
+    // .filter(item => item)
+    // .reduce((a, b) => a + b, 0);
+
+console.log(result);
