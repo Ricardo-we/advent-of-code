@@ -28,6 +28,7 @@ const solution = (card, index) => {
     for (let i = 1; i <= winnedCards.length; i++) {
       const nextCard = input[index + i] ?? input.at(-1);
       copies[cardId] = nextCard ? [nextCard] : [...copies[cardId], nextCard];
+      // input.splice(i, 0, nextCard);
       input.push(nextCard);
     }
   }
