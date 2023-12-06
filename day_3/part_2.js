@@ -1,61 +1,66 @@
-const fs = require('fs');
-const input = fs.readFileSync('./input_1.txt', { encoding: 'utf8', flag: 'r' }).split('\n');
+const fs = require("fs");
+const input = fs
+  .readFileSync("./input_1.txt", { encoding: "utf8", flag: "r" })
+  .split("\n");
 
-const inputAsGrid = input.map(item => {
-    return item.split('');
+const inputAsGrid = input.map((item) => {
+  return item.split("");
 });
 
 const isNumber = (char) => char !== "" && !isNaN(Number(char));
-const isSymbol = (char) => char !== "" && !!char && !isNumber(char) && char !== ".";
-
-const subjacentNumbers = [];
+const isSymbol = (char) =>
+  char !== "" && !!char && !isNumber(char) && char !== ".";
 
 for (let i = 0; i < inputAsGrid.length; i++) {
-    const row = inputAsGrid[i];
-    for (let j = 0; j < row.length; j++) {
-        const char = row[j];
+  const row = inputAsGrid[i];
 
-        if (char !== "*") continue;
-        
-        let numbersAround = 0;
-        const previousRowIndex = inputAsGrid.indexOf(row) - 1;
-        const nextRowIndex = inputAsGrid.indexOf(row) + 1;
-        const previousRow = inputAsGrid[previousRowIndex];
-        const nextRow = inputAsGrid[nextRowIndex];
-        const rightCharToNumber = row[j + 1];
-        const leftCharToNumber = row[j - 1];
+  let coords = [];
+  for (let j = 0; j < inputAsGrid[i].length; j++) {
+    const column = inputAsGrid[i][j];
+    if (column !== "*") continue;
 
-        // console.log(previousRow.slice(j - 1, j + 2).join(""));
-        // console.log(`${leftCharToNumber}${char}${rightCharToNumber}`);
-        // console.log(nextRow.slice(j - 1, j + 2).join(""));
-        // console.log("-------------------------========-------------------------");
+    for (let y of [i - 1, i, i + 1]) {
+      for (let x of [j - 1, j, j + 1]) {
+        if (
+          y < 0 ||
+          x < 0 ||
+          y > inputAsGrid.length ||
+          y > inputAsGrid[x].length ||
+          !isNumber(inputAsGrid[x][y])
+        )
+          continue;
 
-        if (isNumber(rightCharToNumber) || isNumber(leftCharToNumber)) {
-            numbersAround++;
+        while (x > 0 && isNumber(inputAsGrid[y][x - 1])) {
+          x -= 1;
         }
-
-        for (let k = j - 1; k <= j + 2; k++) {
-            const prevRowChar = previousRow ? previousRow[k] : ".";
-            const nextRowChar = nextRow ? nextRow[k] : ".";
-
-            
-            if (isNumber(prevRowChar) || isNumber(nextRowChar)) {
-                numbersAround++;
-                // break;
-            }
-        }
-        console.log(numbersAround);
-        if(numbersAround === 2) 
-            subjacentNumbers.push(Number(numbersAround));
-
+        coords.push([y, x]);
+      }
     }
+  }
+
+  if (coords.length !== 2) continue;
+
+  const result = [];
+
+  for (let i = 0; i < coords.length; i++) {
+    let [y, x] = coords[i];
+    let currentNumber = "";
+
+    while (x < inputAsGrid[y].length && isNumber(inputAsGrid[y][x])) {
+      currentNumber += inputAsGrid[y][x];
+      x += 1;
+    }
+
+    result.push(Number(currentNumber));
+  }
+
+  console.log(result[0] * result[1]);
 }
+
 
 // console.log(JSON.stringify(subjacentNumbers, null, 2));
 // console.log(subjacentNumbers.length);
 // const answer = 509115
 // console.log(subjacentNumbers.reduce((acc, curr) => acc + curr, 0) === answer);
 // console.log(subjacentNumbers.reduce((acc, curr) => acc + curr, 0) - answer);
-console.log(subjacentNumbers.reduce((acc, curr) => acc + curr, 0));
-
-
+// console.log(subjacentNumbers.reduce((acc, curr) => acc + curr, 0));
