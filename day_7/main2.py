@@ -33,30 +33,37 @@ combos = {
 
 class Hand:
     hand = []
+    hand_as_numbers = []
     bid = 0
     score = 0
 
-    def __init__(self, hand, bid, score,):
+    def __init__(self, hand, bid, score=0,):
         self.hand = hand
+        self.hand_as_numbers = [ranks[card] for card in hand]
         self.bid = bid
         self.score = score
 
-
-
-def calc_strn():
-    pass
-
 def calc_strength(hand):
+    repeated = {}
+
+    for card in hand:
+        repeated[card] = 1 if not card in repeated else repeated[card] + 1
+
+    return sum([x for x in repeated.values() if x > 1]) - 1
+
+def calc_rank(hand):
     pass
 
+hands = []
 
-# def calc_strength(hand):
-#     repeated = {}
+for hand in input_:
+    hand = hand.split(" ")
+    hand_ = Hand(hand[0], int(hand[1]))
+    hand_.score = calc_rank(hand_.hands)
+    hands.append(hand_)
 
-#     for card in hand:
-#         repeated[card] = 1 if not card in repeated else repeated[card] + 1
-
-#     return sum([x for x in repeated.values() if x > 1]) - 1
+    # for i, hand in enumerate(hands):
+    #     hands[i].score = calc(hand.hand)
 
 
 # hands = []
