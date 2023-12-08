@@ -1,6 +1,6 @@
 input_ = open("./input_1.txt", "r").readlines()
 
-letters_map = {"T": "A", "J": "B", "Q": "C", "K": "D", "A": "E"}
+letters_map = {"T": "A", "J": ".", "Q": "C", "K": "D", "A": "E"}
 
 def typeof_hand(hand):
     counts = [hand.count(card) for card in hand]
