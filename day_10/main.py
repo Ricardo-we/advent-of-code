@@ -6,6 +6,17 @@ connectables = {
 }
 
 def get_connections(piece, piece_square):
+    if piece == "S":
+        if piece_square.get("right"):
+            return get_piece_square(piece_square.get("right_coords"), input_)
+        if (piece_square.get("up") == "-"):
+            return get_piece_square(piece_square.get("up_coords"), input_)
+        if (piece_square.get("up") == "|"):
+            return get_piece_square(piece_square.get("up_coords"), input_)
+        if (piece_square.get("down") == "|"):
+            return get_piece_square(piece_square.get("down_coords"), input_)
+
+            
     if (piece == "L" and piece_square.get("right") == "-") and (piece == "L" and piece_square.get("up") == "|"):
         return get_piece_square(piece_square.get("right_coords") if piece == "-" else piece_square.get("up_coords"),input_)
 
@@ -42,19 +53,36 @@ def get_piece_square(start_piece_position, loop_map):
         "left_coords": (x - 1, y),
         "right_coords": (x + 1, y),
         "up_coords": (x, y - 1),
-        "down_coords": (x, y + 1)
+        "down_coords": (x, y + 1),
+        "coords_list": [(x - 1, y),(x + 1, y),(x, y - 1),(x, y + 1),],
+        "piece": loop_map[y][x]
     }
 
 def remap(start_piece_position, loop_map):
-    piece_square = get_piece_square(start_piece_position, loop_map) 
-    l_s = get_piece_square((1,3), input_)
-    x = get_connections("L", l_s)
-    print(x)
-    print(piece_square)
-    # piece_square = get_piece_square(piece_square["right_coords"], loop_map)
-    # print(piece_square)
+    piece_square = get_piece_square(start_piece_position, loop_map)
+    loop = [piece_square]
+    paths = []
 
+    while True:
+        if piece_square.get("piece") == "S":
+            for coords in piece_square.get("coords_list"):
+                next_piece = get_piece_square(coords, loop_map)
+                # print(coords, piece_square)
+                # print(next_piece.values()vb )
+                # print(get_connections(coords, piece_square))
+                # path = get_piece_square(coords, loop_map)
+                # paths.append(get_piece_square(coords, loop_map))
+            break
 
-loop = []
+        piece_square = get_connections(start_piece_position, piece_square)
+        loop.append(piece_square)
+        if piece_square == None or (piece_square and piece_square.get("piece") == "S"):
+            break
+        print(piece_square)
+
+    return loop
+
 start_position = find_piece("S")
-remap(start_position, input_)
+loop = remap(start_position, input_)
+
+print(len(loop))
