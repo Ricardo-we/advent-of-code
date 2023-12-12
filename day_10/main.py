@@ -1,34 +1,63 @@
 input_ = open("./input.txt", "r").read().strip().splitlines()
 
-connectables = {
-    "|":  "LJ7F",
-    "-": "LJ7F"
-}
+# connectables = {
+#     "|":  "LJ7F",
+#     "-": "LJ7F"
+# }
 
-def get_connections(piece, piece_square):
-    if piece == "S":
-        if piece_square.get("right"):
-            return get_piece_square(piece_square.get("right_coords"), input_)
-        if (piece_square.get("up") == "-"):
-            return get_piece_square(piece_square.get("up_coords"), input_)
-        if (piece_square.get("up") == "|"):
-            return get_piece_square(piece_square.get("up_coords"), input_)
-        if (piece_square.get("down") == "|"):
-            return get_piece_square(piece_square.get("down_coords"), input_)
+def get_next_piece(piece_square):
+    piece = piece_square.get("piece")
+    is_s_conenction = piece == "S" and (piece_square.get("right") in "-7J" or piece_square.get("left") in "L-F" or piece_square.get("down") in "|JL" or piece_square.get("up") in "|7F")
+    is_l_connection = piece == "L" and piece_square.get("right") == "-" and piece_square.get("up") == "|"
+    is_j_connection = piece == "J" and piece_square.get("left") == "-" and piece_square.get("up") == "|"
+    is_f_connection = piece == "F" and piece_square.get("right") == "-" and piece_square.get("down") == "|"
+    is_7_connection = piece == "7" and piece_square.get("left") == "-" and piece_square.get("down") == "|"
+    is_vertical_pipe = piece == "|" and (piece_square.get("down") in "|JL" or  piece_square.get("up") in "|7F")
+    is_horiz_pipe = piece == "-" and (piece_square.get("left") in "-FL" or  piece_square.get("right") in "-J7")
 
-            
-    if (piece == "L" and piece_square.get("right") == "-") and (piece == "L" and piece_square.get("up") == "|"):
-        return get_piece_square(piece_square.get("right_coords") if piece == "-" else piece_square.get("up_coords"),input_)
-
-    if (piece == "J" and piece_square.get("left") == "-") and (piece == "J" and piece_square.get("up") == "|"):
-        return get_piece_square(piece_square.get("left_coords") if piece == "-" else piece_square.get("up_coords"),input_)
-
-    if (piece == "F" and piece_square.get("right") == "-") and (piece == "F" and piece_square.get("down") == "|"):
-        return get_piece_square(piece_square.get("right_coords") if piece == "-" else piece_square.get("down_coords"),input_)
-
-    if (piece == "7" and piece_square.get("left") == "-") and (piece == "7" and piece_square.get("down") == "|"):
-        return get_piece_square(piece_square.get("left_coords") if piece == "-" else piece_square.get("down_coords"),input_)
+    if is_vertical_pipe:
+        return get_piece_square(
+            piece_square.get("down_coords") if piece_square.get("down") in "|JL" else piece_square.get("up_coords"),
+            input_
+        )
         
+    if is_horiz_pipe:
+        return get_piece_square(
+            piece_square.get("left_coords") if piece_square.get("left") in "-FL"  else piece_square.get("right_coords"),
+            input_
+        )
+    
+    if is_s_conenction:
+        result = []
+        for coords in piece_square.get("coords_list"):
+            result.append(get_piece_square(coords, input_))
+        return result
+
+    if is_l_connection:
+        return get_piece_square(
+            piece_square.get("right_coords") if piece_square.get("right") == "-" else piece_square.get("up_coords"),
+            input_
+        )  
+
+    if is_j_connection:
+        return get_piece_square(
+            piece_square.get("left_coords") if piece_square.get("right") == "-" else piece_square.get("up_coords"),
+            input_
+        )  
+
+    if is_f_connection:
+        return get_piece_square(
+            piece_square.get("right_coords") if piece_square.get("right") == "-" else piece_square.get("down_coords"),
+            input_
+        )  
+
+    if is_7_connection:
+        return get_piece_square(
+            piece_square.get("left_coords") if piece_square.get("right") == "-" else piece_square.get("down_coords"),
+            input_
+        )  
+
+    
 
 def find_piece(piece_name):
     for row in input_:
@@ -62,23 +91,48 @@ def remap(start_piece_position, loop_map):
     piece_square = get_piece_square(start_piece_position, loop_map)
     loop = [piece_square]
     paths = []
+    max_moves = 0
 
-    while True:
-        if piece_square.get("piece") == "S":
-            for coords in piece_square.get("coords_list"):
-                next_piece = get_piece_square(coords, loop_map)
-                # print(coords, piece_square)
-                # print(next_piece.values()vb )
-                # print(get_connections(coords, piece_square))
-                # path = get_piece_square(coords, loop_map)
-                # paths.append(get_piece_square(coords, loop_map))
-            break
+    for piece in get_next_piece(piece_square):
+        piece_square = get_next_piece(piece)
+        if not piece_square or piece_square.get("piece") == "S": 
+            continue
+        while True:
+            piece_square = get_next_piece(piece_square)
+            print(piece_square)
+            max_moves += 1
+            if not piece_square or piece_square.get("piece") == "S":
+                break
+            
+        if max_moves > 0:
+            return max_moves
 
-        piece_square = get_connections(start_piece_position, piece_square)
-        loop.append(piece_square)
-        if piece_square == None or (piece_square and piece_square.get("piece") == "S"):
-            break
-        print(piece_square)
+        # print("---PIECE---",piece)
+        # print(get_next_piece(piece))
+    
+    # while True:
+    #     piece_square = get_next_piece(piece_square)
+    #     if type(piece_square) == list:
+    #         for piece in piece_square:
+    #             print(piece)
+        #         loop.append(piece)
+        #     break
+        # print(piece_square)
+        # loop.append(piece_square)
+
+        # if not piece_square or piece_square.get("piece") == "S":
+        #     break
+
+
+    
+    # piece_square = get_piece_square(piece_square.get("right_coords"), loop_map)
+    # piece_square = get_piece_square(piece_square.get("right_coords"), loop_map)
+    # piece_square = get_piece_square(piece_square.get("down_coords"), loop_map)
+    # piece_square = get_piece_square(piece_square.get("down_coords"), loop_map)
+    # piece_square = get_piece_square(piece_square.get("left_coords"), loop_map)
+    # piece_square = get_piece_square(piece_square.get("left_coords"), loop_map)
+    # piece_square = get_piece_square(piece_square.get("up_coords"), loop_map)
+    # piece_square = get_piece_square(piece_square.get("up_coords"), loop_map)
 
     return loop
 
