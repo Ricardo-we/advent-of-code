@@ -8,6 +8,8 @@ OFFSETS = {
     "F": ((0, 1), (1, 0)),
 }
 
+
+
 def add_points(a: GridPoint, b: GridPoint) -> GridPoint:
     """
     add a pair of 2-tuples together. Useful for calculating a new position from a location and an offset
