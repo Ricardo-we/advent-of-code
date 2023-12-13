@@ -1,53 +1,69 @@
+from collections import deque
 
-OFFSETS = {
-    "|": ((1, 0), (-1, 0)),
-    "-": ((0, 1), (0, -1)),
-    "L": ((-1, 0), (0, 1)),
-    "J": ((-1, 0), (0, -1)),
-    "7": ((0, -1), (1, 0)),
-    "F": ((0, 1), (1, 0)),
-}
+with open("./input.txt") as fin:
+    lines = fin.read().strip().split("\n")
+
+n, m = len(lines), len(lines[0])
+
+# Time for graph shenanigans
+# Construct adjacency graph
 
 
-
-def add_points(a: GridPoint, b: GridPoint) -> GridPoint:
-    """
-    add a pair of 2-tuples together. Useful for calculating a new position from a location and an offset
-    """
-    return a[0] + b[0], a[1] + b[1]
-
-def possible_moves(current: GridPoint, c: str) -> tuple[GridPoint, GridPoint]:
-    res = tuple(add_points(current, o) for o in OFFSETS[c])
-    assert len(res) == 2
+def get_nbrs(i, j):
+    res = []
+    for di, dj in list(get_dnbrs(i, j)):
+        ii, jj = i + di, j + dj
+        if not (0 <= ii < n and 0 <= jj < m):
+            continue
+        res.append((ii, jj))
     return res
 
-def find_start_adjacent(grid: Grid, grid_size: int, start: GridPoint) -> GridPoint:
-    result = []
-    for neighbor in neighbors(start, 4, max_size=grid_size - 1, ignore_negatives=True):
-        if grid[neighbor] == ".":
+
+def get_dnbrs(i, j):
+    res = []
+    if lines[i][j] == "S":
+        for di, dj in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+            ii, jj = i + di, j + dj
+            if not (0 <= ii < n and 0 <= jj < m):
+                continue
+
+            if (i, j) in list(get_nbrs(ii, jj)):
+                res.append((di, dj))
+        return res
+
+    return {
+        "|": [(1, 0), (-1, 0)],
+        "-": [(0, 1), (0, -1)],
+        "L": [(-1, 0), (0, 1)],
+        "J": [(-1, 0), (0, -1)],
+        "7": [(1, 0), (0, -1)],
+        "F": [(1, 0), (0, 1)],
+        ".": [],
+    }[lines[i][j]]
+
+
+si, sj = None, None
+for i, line in enumerate(lines):
+    if "S" in line:
+        si, sj = i, line.index("S")
+        break
+
+
+# Do a BFS
+visited = set()
+dists = {}
+q = deque([((si, sj), 0)])
+while len(q) > 0:
+    top, dist = q.popleft()
+    if top in visited:
+        continue
+    visited.add(top)
+    dists[top] = dist
+
+    for nbr in list(get_nbrs(*top)):
+        if nbr in visited:
             continue
+        q.append((nbr, dist + 1))
 
-        if start in possible_moves(neighbor, grid[neighbor]):
-            result.append(neighbor)
-
-    assert (
-        len(result) == 2
-    ), f"didn't find exactly 2 points that could reach start: {result}"
-    return result[0]
-
-def part_1(self) -> int:
-        grid = parse_grid(self.input)
-        start = next(k for k, v in grid.items() if v == "S")
-        points = [start]
-
-        current = find_start_adjacent(grid, len(self.input), start)
-
-        while True:
-            last = points[-1]
-            points.append(current)
-            a, b = possible_moves(current, grid[current])
-
-            if (a == start or b == start) and last != start:
-                return ceil(len(points) / 2)
-
-            current = a if b == last else b
+ans = max(dists.values())
+print(ans)
