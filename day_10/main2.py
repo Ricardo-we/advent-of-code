@@ -9,9 +9,9 @@ n, m = len(lines), len(lines[0])
 # Construct adjacency graph
 
 
-def get_nbrs(i, j):
+def get_adjacents(i, j):
     res = []
-    for di, dj in list(get_dnbrs(i, j)):
+    for di, dj in list(get_next_piece(i, j)):
         ii, jj = i + di, j + dj
         if not (0 <= ii < n and 0 <= jj < m):
             continue
@@ -19,7 +19,7 @@ def get_nbrs(i, j):
     return res
 
 
-def get_dnbrs(i, j):
+def get_next_piece(i, j):
     res = []
     if lines[i][j] == "S":
         for di, dj in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
@@ -27,7 +27,7 @@ def get_dnbrs(i, j):
             if not (0 <= ii < n and 0 <= jj < m):
                 continue
 
-            if (i, j) in list(get_nbrs(ii, jj)):
+            if (i, j) in list(get_adjacents(ii, jj)):
                 res.append((di, dj))
         return res
 
@@ -49,7 +49,6 @@ for i, line in enumerate(lines):
         break
 
 
-# Do a BFS
 visited = set()
 dists = {}
 q = deque([((si, sj), 0)])
@@ -60,7 +59,7 @@ while len(q) > 0:
     visited.add(top)
     dists[top] = dist
 
-    for nbr in list(get_nbrs(*top)):
+    for nbr in list(get_adjacents(*top)):
         if nbr in visited:
             continue
         q.append((nbr, dist + 1))

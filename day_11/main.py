@@ -32,4 +32,4 @@ for i, coords in enumerate(num_coords):
         universe_size += 1
         result += galaxies_dist * universe_size
 
-print(result + 999_999)
+print(result)
