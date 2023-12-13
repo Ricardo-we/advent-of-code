@@ -1,3 +1,4 @@
+import math
 input_ = [list(row) for row in open("./input.txt", "r").read().splitlines()]
 
 
@@ -6,6 +7,7 @@ input_ = [list(row) for row in open("./input.txt", "r").read().splitlines()]
 # 2. b_coords - a_coords, this will return de difference between the two galaxies
 
 def get_galaxies_distance(a,b):
+    # return math.sqrt(math.pow(abs(b[0] - a[0]),2)  + math.pow(abs(b[1] - a[1]),2))
     return abs(b[0] - a[0])  + abs(b[1] - a[1])
 
     
