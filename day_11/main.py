@@ -72,8 +72,7 @@ for i, coords in enumerate(num_coords):
 
 print(result * 100_000_000_000)
 print(result == 9599070)
+
 # for l in 2, 1_000_000: print(sum(map(get_galaxies_distance, [xs, ys])))
 # 
 # print(result + 999_999_999)
-
-# 842645913794 - 9599070
